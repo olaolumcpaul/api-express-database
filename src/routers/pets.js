@@ -1,103 +1,103 @@
 const router = require("express").Router();
 
 module.exports = function (pool) {
-  // GET all books
+  // GET all pets
   router.get("/", async function (req, res) {
     const client = await pool.connect();
     try {
-      const response = await client.query("SELECT * FROM books");
-      const books = response.rows;
-      res.json({ books: books });
+      const response = await client.query("SELECT * FROM pets");
+      const pets = response.rows;
+      res.json({ pets: pets });
     } catch (error) {
-      console.error("Error fetching books: ", error);
+      console.error("Error fetching pets: ", error);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       client.release();
     }
   });
 
-  // GET a book by ID
+  // GET a pet by ID
   router.get("/:id", async function (req, res) {
     const client = await pool.connect();
     const { id } = req.params;
     try {
-      const response = await client.query("SELECT * FROM books WHERE id = $1", [
+      const response = await client.query("SELECT * FROM pets WHERE id = $1", [
         id,
       ]);
-      const book = response.rows[0];
-      if (book) {
-        res.json({ book: book });
+      const pet = response.rows[0];
+      if (pet) {
+        res.json({ pet: pet });
       } else {
-        res.status(404).json({ error: "Book not found" });
+        res.status(404).json({ error: "Pet not found" });
       }
     } catch (error) {
-      console.error("Error fetching book by ID: ", error);
+      console.error("Error fetching pet by ID: ", error);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       client.release();
     }
   });
 
-  // POST a new book
+  // POST a new pet
   router.post("/", async function (req, res) {
     const client = await pool.connect();
-    const { title, author, genre, year } = req.body;
+    const { name, type, age, owner } = req.body;
     try {
       const response = await client.query(
-        "INSERT INTO books (title, author, genre, year) VALUES ($1, $2, $3, $4) RETURNING *",
-        [title, author, genre, year]
+        "INSERT INTO pets (name, type, age, owner) VALUES ($1, $2, $3, $4) RETURNING *",
+        [name, type, age, owner]
       );
-      const newBook = response.rows[0];
-      res.status(201).json({ book: newBook });
+      const newPet = response.rows[0];
+      res.status(201).json({ pet: newPet });
     } catch (error) {
-      console.error("Error creating a new book: ", error);
+      console.error("Error creating a new pet: ", error);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       client.release();
     }
   });
 
-  // PUT update an existing book by ID
+  // PUT update an existing pet by ID
   router.put("/:id", async function (req, res) {
     const client = await pool.connect();
     const { id } = req.params;
-    const { title, author, genre, year } = req.body;
+    const { name, type, age, owner } = req.body;
     try {
       const response = await client.query(
-        "UPDATE books SET title = $1, author = $2, genre = $3, year = $4 WHERE id = $5 RETURNING *",
-        [title, author, genre, year, id]
+        "UPDATE pets SET name = $1, type = $2, age = $3, owner = $4 WHERE id = $5 RETURNING *",
+        [name, type, age, owner, id]
       );
-      const updatedBook = response.rows[0];
-      if (updatedBook) {
-        res.json({ book: updatedBook });
+      const updatedPet = response.rows[0];
+      if (updatedPet) {
+        res.json({ pet: updatedPet });
       } else {
-        res.status(404).json({ error: "Book not found" });
+        res.status(404).json({ error: "Pet not found" });
       }
     } catch (error) {
-      console.error("Error updating book: ", error);
+      console.error("Error updating pet: ", error);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       client.release();
     }
   });
 
-  // DELETE a book by ID
+  // DELETE a pet by ID
   router.delete("/:id", async function (req, res) {
     const client = await pool.connect();
     const { id } = req.params;
     try {
       const response = await client.query(
-        "DELETE FROM books WHERE id = $1 RETURNING *",
+        "DELETE FROM pets WHERE id = $1 RETURNING *",
         [id]
       );
-      const deletedBook = response.rows[0];
-      if (deletedBook) {
-        res.json({ book: deletedBook });
+      const deletedPet = response.rows[0];
+      if (deletedPet) {
+        res.json({ pet: deletedPet });
       } else {
-        res.status(404).json({ error: "Book not found" });
+        res.status(404).json({ error: "Pet not found" });
       }
     } catch (error) {
-      console.error("Error deleting book: ", error);
+      console.error("Error deleting pet: ", error);
       res.status(500).json({ error: "Internal Server Error" });
     } finally {
       client.release();
